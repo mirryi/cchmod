@@ -1,0 +1,12 @@
+[package]
+name = "cchmod"
+version = "0.1.0"
+authors = ["Eric Zhao <21zhaoe@protonmail.com>"]
+edition = "2018"
+
+[[bin]]
+name = "cchmod"
+path = "src/bin/cchmod.rs"
+
+[dependencies]
+clap = "3.0.0-beta.2"
