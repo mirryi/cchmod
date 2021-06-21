@@ -27,9 +27,9 @@ impl Mode {
     pub fn as_sym(&self) -> String {
         format!(
             "{}{}{}",
-            self.user.as_sym(),
-            self.group.as_sym(),
-            self.other.as_sym()
+            self.user.as_sym_full(),
+            self.group.as_sym_full(),
+            self.other.as_sym_full()
         )
     }
 
@@ -56,6 +56,13 @@ impl Perm {
         let r = if self.read { "r" } else { "" };
         let w = if self.write { "w" } else { "" };
         let x = if self.execute { "x" } else { "" };
+        format!("{}{}{}", r, w, x)
+    }
+
+    pub fn as_sym_full(&self) -> String {
+        let r = if self.read { "r" } else { "-" };
+        let w = if self.write { "w" } else { "-" };
+        let x = if self.execute { "x" } else { "-" };
         format!("{}{}{}", r, w, x)
     }
 
@@ -201,5 +208,26 @@ mod test {
         test_mode_num!(666; true, true, false; true, true, false; true, true, false);
         test_mode_num!(644; true, true, false; true, false, false; true, false, false);
         test_mode_num!(400; true, false, false; false, false, false; false, false, false);
+    }
+
+    #[test]
+    fn test_mode_sym() {
+        macro_rules! mode_sym {
+            ($ur:expr, $uw:expr, $ux:expr, $gr:expr, $gw:expr, $gx:expr, $or:expr, $ow:expr, $ox: expr) => {
+                mode!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox).as_sym()
+            };
+        }
+
+        macro_rules! test_mode_sym {
+            ($c:expr; $ur:expr, $uw:expr, $ux:expr; $gr:expr, $gw:expr, $gx:expr; $or:expr, $ow:expr, $ox: expr) => {
+                assert_eq!($c, mode_sym!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox))
+            };
+        }
+
+        test_mode_sym!("rwxrwxrwx"; true, true, true; true, true, true; true, true, true);
+        test_mode_sym!("rwxr-xr-x"; true, true, true; true, false, true; true, false, true);
+        test_mode_sym!("rw-rw-rw-"; true, true, false; true, true, false; true, true, false);
+        test_mode_sym!("rw-r--r--"; true, true, false; true, false, false; true, false, false);
+        test_mode_sym!("r--------"; true, false, false; false, false, false; false, false, false);
     }
 }
