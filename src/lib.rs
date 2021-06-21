@@ -119,6 +119,23 @@ mod test {
         };
     }
 
+    macro_rules! mode {
+        ($u:expr, $g:expr, $o:expr) => {
+            Mode {
+                user: $u,
+                group: $g,
+                other: $o,
+            }
+        };
+        ($ur:expr, $uw:expr, $ux:expr, $gr:expr, $gw:expr, $gx:expr, $or:expr, $ow:expr, $ox: expr) => {
+            Mode {
+                user: perm!($ur, $uw, $ux),
+                group: perm!($gr, $gw, $gx),
+                other: perm!($or, $ow, $ox),
+            }
+        };
+    }
+
     #[test]
     fn test_perm_num() {
         macro_rules! perm_num {
@@ -163,5 +180,26 @@ mod test {
         test_perm_sym!("wx", false, true, true);
         test_perm_sym!("w", false, true, false);
         test_perm_sym!("x", false, false, true);
+    }
+
+    #[test]
+    fn test_mode_num() {
+        macro_rules! mode_num {
+            ($ur:expr, $uw:expr, $ux:expr, $gr:expr, $gw:expr, $gx:expr, $or:expr, $ow:expr, $ox: expr) => {
+                mode!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox).as_num()
+            };
+        }
+
+        macro_rules! test_mode_num {
+            ($c:expr; $ur:expr, $uw:expr, $ux:expr; $gr:expr, $gw:expr, $gx:expr; $or:expr, $ow:expr, $ox: expr) => {
+                assert_eq!($c, mode_num!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox))
+            };
+        }
+
+        test_mode_num!(777; true, true, true; true, true, true; true, true, true);
+        test_mode_num!(755; true, true, true; true, false, true; true, false, true);
+        test_mode_num!(666; true, true, false; true, true, false; true, true, false);
+        test_mode_num!(644; true, true, false; true, false, false; true, false, false);
+        test_mode_num!(400; true, false, false; false, false, false; false, false, false);
     }
 }
