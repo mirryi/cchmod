@@ -56,6 +56,18 @@ impl Mode {
     }
 
     /// Get the numeric representation the [`Mode`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cchmod::{Mode, Perm};
+    ///
+    /// let m = Mode::new(Perm::new(true, true, true),
+    ///                   Perm::new(true, false, true),
+    ///                   Perm::new(true, false, true));
+    ///
+    /// assert_eq!("755", m.as_num());
+    /// ```
     #[inline]
     pub fn as_num(&self) -> String {
         format!(
@@ -66,6 +78,19 @@ impl Mode {
         )
     }
 
+    /// Get the symbolic representation the [`Mode`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cchmod::{Mode, Perm};
+    ///
+    /// let m = Mode::new(Perm::new(true, true, true),
+    ///                   Perm::new(true, false, true),
+    ///                   Perm::new(true, false, true));
+    ///
+    /// assert_eq!("rwxr-xr-x", m.as_sym());
+    /// ```
     #[inline]
     pub fn as_sym(&self) -> String {
         format!(
@@ -76,6 +101,25 @@ impl Mode {
         )
     }
 
+    /// Create a [`Mode`] from its numeric form, returning [`ParseError`] if the input is invalid.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cchmod::{Mode, Perm, ParseError};
+    ///
+    /// assert_eq!(
+    ///     Mode::new(Perm::new(true, true, true),
+    ///               Perm::new(true, false, true),
+    ///               Perm::new(true, false, true)),
+    ///     Mode::from_num("755").unwrap()
+    /// );
+    ///
+    /// assert_eq!(
+    ///     ParseError::UnexpectedChar { pos: 3, c: '8', expected: None },
+    ///     Mode::from_num("6008").unwrap_err()
+    /// );
+    /// ```
     #[inline]
     pub fn from_num(num: &str) -> Result<Self, ParseError> {
         #[inline]
@@ -115,6 +159,29 @@ impl Mode {
         }
     }
 
+    /// Create a [`Mode`] from its symbolic form, returning [`ParseError`] if the input is invalid.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cchmod::{Mode, Perm, ParseError};
+    ///
+    /// assert_eq!(
+    ///     Mode::new(Perm::new(true, true, true),
+    ///               Perm::new(true, false, true),
+    ///               Perm::new(true, false, true)),
+    ///     Mode::from_sym("rwxr-xr-x").unwrap()
+    /// );
+    ///
+    /// assert_eq!(
+    ///     ParseError::UnexpectedEoi { pos: 6 },
+    ///     Mode::from_sym("rwxr-x").unwrap_err()
+    /// );
+    /// assert_eq!(
+    ///     ParseError::UnexpectedChar { pos: 9, c: 'r', expected: None },
+    ///     Mode::from_sym("rwxr-xr-xr").unwrap_err()
+    /// );
+    /// ```
     #[inline]
     pub fn from_sym(sym: &str) -> Result<Self, ParseError> {
         #[inline]
@@ -146,6 +213,25 @@ impl Mode {
         }
     }
 
+    /// Compute the diff ([`ModeDiff`]) between two modes.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cchmod::{Mode, ModeDiff, PermDiff, DiffOp::*};
+    ///
+    /// let a = Mode::from_num("777").unwrap();
+    /// let b = Mode::from_num("644").unwrap();
+    ///
+    /// assert_eq!(
+    ///     ModeDiff {
+    ///         user: PermDiff { read: Same, write: Same, execute: Minus },
+    ///         group: PermDiff { read: Same, write: Minus, execute: Minus },
+    ///         other: PermDiff { read: Same, write: Minus, execute: Minus },
+    ///     },
+    ///     a.diff(&b)
+    /// );
+    /// ```
     #[inline]
     pub fn diff(&self, other: &Self) -> ModeDiff {
         ModeDiff {
