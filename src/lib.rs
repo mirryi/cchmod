@@ -51,11 +51,33 @@ impl Mode {
 
     #[inline]
     pub fn from_sym(sym: &str) -> Result<Self, ParseError> {
-        let user = Perm::from_sym_full(&sym.chars().take(3).collect::<String>())?;
-        let group = Perm::from_sym_full(&sym.chars().skip(3).take(3).collect::<String>())?;
-        let other = Perm::from_sym_full(&sym.chars().skip(6).take(3).collect::<String>())?;
+        #[inline]
+        fn shift_err(diff: usize) -> impl Fn(ParseError) -> ParseError {
+            move |err: ParseError| match err {
+                ParseError::UnexpectedEoi { pos } => ParseError::UnexpectedEoi { pos: pos + diff },
+                ParseError::UnexpectedChar { c, pos, expected } => ParseError::UnexpectedChar {
+                    c,
+                    pos: pos + diff,
+                    expected,
+                },
+            }
+        }
 
-        Ok(Self { user, group, other })
+        let user = Perm::from_sym_full(&sym.chars().take(3).collect::<String>())?;
+        let group = Perm::from_sym_full(&sym.chars().skip(3).take(3).collect::<String>())
+            .map_err(shift_err(3))?;
+        let other = Perm::from_sym_full(&sym.chars().skip(6).take(3).collect::<String>())
+            .map_err(shift_err(6))?;
+
+        if let Some(c) = sym.chars().nth(9) {
+            Err(ParseError::UnexpectedChar {
+                c,
+                pos: 9,
+                expected: None,
+            })
+        } else {
+            Ok(Self { user, group, other })
+        }
     }
 
     #[inline]
@@ -313,11 +335,36 @@ mod test {
             };
         }
 
+        macro_rules! test_mode_sym_e {
+            ($fs:expr, $err:expr) => {
+                assert_eq!($err, Mode::from_sym($fs).unwrap_err())
+            };
+        }
+
         test_mode_sym!("rwxrwxrwx"; true, true, true; true, true, true; true, true, true);
         test_mode_sym!("rwxr-xr-x"; true, true, true; true, false, true; true, false, true);
         test_mode_sym!("rw-rw-rw-"; true, true, false; true, true, false; true, true, false);
         test_mode_sym!("rw-r--r--"; true, true, false; true, false, false; true, false, false);
         test_mode_sym!("r--------"; true, false, false; false, false, false; false, false, false);
+
+        test_mode_sym_e!("r", ParseError::UnexpectedEoi { pos: 1 });
+        test_mode_sym_e!("rwx", ParseError::UnexpectedEoi { pos: 3 });
+        test_mode_sym_e!(
+            "rwxrx",
+            ParseError::UnexpectedChar {
+                pos: 4,
+                c: 'x',
+                expected: Some(vec!['w', '-'])
+            }
+        );
+        test_mode_sym_e!(
+            "rwxr-xr-x-",
+            ParseError::UnexpectedChar {
+                pos: 9,
+                c: '-',
+                expected: None
+            }
+        );
 
         Ok(())
     }
