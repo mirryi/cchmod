@@ -308,11 +308,13 @@ mod test {
     }
 
     #[test]
-    fn test_perm_as_num() {
+    fn test_perm_as_num() -> Result<(), Box<dyn std::error::Error>> {
         macro_rules! test_perm_num {
-            ($c:expr, $r: expr, $w:expr, $x:expr) => {
-                assert_eq!($c, perm!($r, $w, $x).as_num())
-            };
+            ($c:expr, $r: expr, $w:expr, $x:expr) => {{
+                let p = perm!($r, $w, $x);
+                assert_eq!($c, p.as_num());
+                assert_eq!(p, Perm::from_num($c)?)
+            }};
         }
 
         test_perm_num!("7", true, true, true);
@@ -323,6 +325,8 @@ mod test {
         test_perm_num!("2", false, true, false);
         test_perm_num!("1", false, false, true);
         test_perm_num!("0", false, false, false);
+
+        Ok(())
     }
 
     #[test]
@@ -380,12 +384,16 @@ mod test {
     }
 
     #[test]
-    fn test_mode_as_num() {
+    fn test_mode_as_num() -> Result<(), Box<dyn std::error::Error>> {
         macro_rules! test_mode_num {
             ($c:expr; $ur:expr, $uw:expr, $ux:expr; $gr:expr, $gw:expr, $gx:expr; $or:expr, $ow:expr, $ox: expr) => {
                 assert_eq!(
                     $c,
                     mode!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox).as_num()
+                );
+                assert_eq!(
+                    mode!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox),
+                    Mode::from_num($c)?
                 )
             };
         }
@@ -395,6 +403,8 @@ mod test {
         test_mode_num!("666"; true, true, false; true, true, false; true, true, false);
         test_mode_num!("644"; true, true, false; true, false, false; true, false, false);
         test_mode_num!("400"; true, false, false; false, false, false; false, false, false);
+
+        Ok(())
     }
 
     #[test]
