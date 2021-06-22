@@ -52,7 +52,7 @@ pub enum ParseError {
 impl Mode {
     /// Create a new [`Mode`].
     #[inline]
-    pub fn new(user: Perm, group: Perm, other: Perm) -> Self {
+    pub const fn new(user: Perm, group: Perm, other: Perm) -> Self {
         Self { user, group, other }
     }
 
@@ -234,7 +234,7 @@ impl Mode {
     /// );
     /// ```
     #[inline]
-    pub fn diff(&self, other: &Self) -> ModeDiff {
+    pub const fn diff(&self, other: &Self) -> ModeDiff {
         ModeDiff {
             user: self.user.diff(&other.user),
             group: self.group.diff(&other.group),
@@ -246,7 +246,7 @@ impl Mode {
 impl Perm {
     /// Create a new [`Perm`].
     #[inline]
-    pub fn new(read: bool, write: bool, execute: bool) -> Self {
+    pub const fn new(read: bool, write: bool, execute: bool) -> Self {
         Self {
             read,
             write,
@@ -443,7 +443,7 @@ impl Perm {
     /// );
     /// ```
     #[inline]
-    pub fn diff(&self, other: &Self) -> PermDiff {
+    pub const fn diff(&self, other: &Self) -> PermDiff {
         PermDiff {
             read: bool_diff(self.read, other.read),
             write: bool_diff(self.write, other.write),
@@ -489,7 +489,7 @@ pub enum DiffOp {
 }
 
 #[inline]
-fn bool_diff(a: bool, b: bool) -> DiffOp {
+const fn bool_diff(a: bool, b: bool) -> DiffOp {
     use DiffOp::*;
 
     if a ^ b {
