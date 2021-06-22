@@ -61,6 +61,13 @@ jobs:
   clippy:
     name: clippy
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - beta
+          - nightly
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
@@ -77,6 +84,13 @@ jobs:
   fmt:
     name: fmt 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - beta
+          - nightly
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -97,6 +111,13 @@ jobs:
   docs:
     name: docs
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - beta
+          - nightly
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
