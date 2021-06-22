@@ -8,36 +8,6 @@ on:
       - '**/README.md'
 
 jobs:
-  msrv:
-    name: msrv
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust:
-          - stable
-          - nightly
-          - 1.46.0
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.rust }}
-          override: true
-
-      - name: Install cargo-msrv
-        run: cargo install cargo-msrv
-
-      - name: Verify msrv
-        uses: actions-rs/cargo@v1
-        with:
-          command: msrv
-          args: --verify
-
   check:
     name: check
     runs-on: ubuntu-latest
@@ -120,8 +90,6 @@ jobs:
       matrix:
         rust:
           - stable
-          - nightly
-          - 1.46.0
 
     steps:
       - name: Checkout repository
@@ -150,8 +118,6 @@ jobs:
       matrix:
         rust:
           - stable
-          - nightly
-          - 1.46.0
 
     steps:
       - name: Checkout repository
@@ -169,3 +135,32 @@ jobs:
         with:
           command: doc
           args: --no-deps --document-private-items --workspace
+
+  msrv:
+    name: msrv
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+
+      - name: Install cargo-msrv
+        run: cargo install cargo-msrv
+
+      - name: Verify msrv
+        uses: actions-rs/cargo@v1
+        with:
+          command: msrv
+          args: --verify
+
