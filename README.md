@@ -59,7 +59,7 @@ $ cchmod -s 7
 rwx
 ```
 
-## Library
+### Library
 
 cchmod can be used as a library:
 
@@ -67,7 +67,7 @@ cchmod can be used as a library:
 use cchmod::Mode;
 
 let m = Mode::from_sym("rw-r--r--").unwrap();
-println!(m.as_num());
+println!("{}", m.as_num());
 ```
 
 See the [docs](https://docs.rs/cchmod/0.1.0/cchmod/) for more information.
