@@ -232,9 +232,9 @@ impl Perm {
     #[inline]
     pub fn diff(&self, other: &Self) -> PermDiff {
         PermDiff {
-            read: diff(self.read, other.read),
-            write: diff(self.write, other.write),
-            execute: diff(self.execute, other.execute),
+            read: bool_diff(self.read, other.read),
+            write: bool_diff(self.write, other.write),
+            execute: bool_diff(self.execute, other.execute),
         }
     }
 }
@@ -272,7 +272,7 @@ pub enum DiffOp {
 }
 
 #[inline]
-fn diff(a: bool, b: bool) -> DiffOp {
+fn bool_diff(a: bool, b: bool) -> DiffOp {
     use DiffOp::*;
 
     if a ^ b {
