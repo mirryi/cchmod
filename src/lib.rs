@@ -4,38 +4,58 @@ use std::str::Chars;
 
 use thiserror::Error;
 
+/// File system object mode.
 #[derive(Debug, PartialEq)]
 pub struct Mode {
+    /// Permission set for the owning user.
     pub user: Perm,
+    /// Permission set for the group.
     pub group: Perm,
+    /// Permission set for all other users.
     pub other: Perm,
 }
 
+/// File system object permissions.
 #[derive(Debug, PartialEq)]
 pub struct Perm {
+    /// Flag indicating whether *read* permission is granted.
     pub read: bool,
+    /// Flag indicating whether *write* permission is granted.
     pub write: bool,
+    /// Flag indicating whether *execute* permission is granted.
     pub execute: bool,
 }
 
+/// Error encountered when parsing a string into a [`Mode`] or [`Perm`].
 #[derive(Debug, PartialEq, Error)]
 pub enum ParseError {
+    /// An unexpected character was encountered while parsing (e.g. an 'r' when an 'x' or '-' was
+    /// expected, or any character after EOI was expected).
     #[error("invalid character encountered")]
     UnexpectedChar {
+        /// The position (zero-indexed) of the unexpected character.
         pos: usize,
+        /// The character encountered.
         c: char,
+        /// A list of expected characters at this position. If [`None`], EOI was expected.
         expected: Option<Vec<char>>,
     },
+    /// End-of-input was encountered when more input was expected.
     #[error("unexepected end-of-input")]
-    UnexpectedEoi { pos: usize },
+    UnexpectedEoi {
+        /// The position (zero-indexed) where another character was expected.
+        pos: usize,
+    },
 }
 
 impl Mode {
+    /// Create a new [`Mode`].
     #[inline]
     pub fn new(user: Perm, group: Perm, other: Perm) -> Self {
         Self { user, group, other }
     }
 
+    /// Get the numeric representation the [`Mode`].
     #[inline]
     pub fn as_num(&self) -> String {
         format!(
