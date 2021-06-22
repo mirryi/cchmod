@@ -213,15 +213,9 @@ mod test {
 
     #[test]
     fn test_perm_as_num() {
-        macro_rules! perm_num {
-            ($r:expr, $w:expr, $x:expr) => {
-                perm!($r, $w, $x).as_num()
-            };
-        }
-
         macro_rules! test_perm_num {
             ($c:expr, $r: expr, $w:expr, $x:expr) => {
-                assert_eq!($c, perm_num!($r, $w, $x))
+                assert_eq!($c, perm!($r, $w, $x).as_num())
             };
         }
 
@@ -235,39 +229,33 @@ mod test {
     }
 
     #[test]
-    fn test_perm_as_sym() {
-        macro_rules! perm_sym {
-            ($r:expr, $w:expr, $x:expr) => {
-                perm!($r, $w, $x).as_sym()
-            };
-        }
-
+    fn test_perm_as_sym() -> Result<(), Box<dyn std::error::Error>> {
         macro_rules! test_perm_sym {
-            ($c:expr, $r: expr, $w:expr, $x:expr) => {
-                assert_eq!($c, perm_sym!($r, $w, $x))
+            ($s:expr, $fs:expr, $r: expr, $w:expr, $x:expr) => {
+                assert_eq!($s, perm!($r, $w, $x).as_sym());
+                assert_eq!(perm!($r, $w, $x), Perm::from_sym($fs)?)
             };
         }
 
-        test_perm_sym!("rwx", true, true, true);
-        test_perm_sym!("rw", true, true, false);
-        test_perm_sym!("rx", true, false, true);
-        test_perm_sym!("r", true, false, false);
-        test_perm_sym!("wx", false, true, true);
-        test_perm_sym!("w", false, true, false);
-        test_perm_sym!("x", false, false, true);
+        test_perm_sym!("rwx", "rwx", true, true, true);
+        test_perm_sym!("rw", "rw-", true, true, false);
+        test_perm_sym!("rx", "r-x", true, false, true);
+        test_perm_sym!("r", "r--", true, false, false);
+        test_perm_sym!("wx", "-wx", false, true, true);
+        test_perm_sym!("w", "-w-", false, true, false);
+        test_perm_sym!("x", "--x", false, false, true);
+
+        Ok(())
     }
 
     #[test]
     fn test_mode_as_num() {
-        macro_rules! mode_num {
-            ($ur:expr, $uw:expr, $ux:expr, $gr:expr, $gw:expr, $gx:expr, $or:expr, $ow:expr, $ox: expr) => {
-                mode!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox).as_num()
-            };
-        }
-
         macro_rules! test_mode_num {
             ($c:expr; $ur:expr, $uw:expr, $ux:expr; $gr:expr, $gw:expr, $gx:expr; $or:expr, $ow:expr, $ox: expr) => {
-                assert_eq!($c, mode_num!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox))
+                assert_eq!(
+                    $c,
+                    mode!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox).as_num()
+                )
             };
         }
 
@@ -279,16 +267,17 @@ mod test {
     }
 
     #[test]
-    fn test_mode_as_sym() {
-        macro_rules! mode_sym {
-            ($ur:expr, $uw:expr, $ux:expr, $gr:expr, $gw:expr, $gx:expr, $or:expr, $ow:expr, $ox: expr) => {
-                mode!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox).as_sym()
-            };
-        }
-
+    fn test_mode_sym() -> Result<(), Box<dyn std::error::Error>> {
         macro_rules! test_mode_sym {
             ($c:expr; $ur:expr, $uw:expr, $ux:expr; $gr:expr, $gw:expr, $gx:expr; $or:expr, $ow:expr, $ox: expr) => {
-                assert_eq!($c, mode_sym!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox))
+                assert_eq!(
+                    $c,
+                    mode!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox).as_sym()
+                );
+                assert_eq!(
+                    mode!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox),
+                    Mode::from_sym($c)?
+                )
             };
         }
 
@@ -297,5 +286,7 @@ mod test {
         test_mode_sym!("rw-rw-rw-"; true, true, false; true, true, false; true, true, false);
         test_mode_sym!("rw-r--r--"; true, true, false; true, false, false; true, false, false);
         test_mode_sym!("r--------"; true, false, false; false, false, false; false, false, false);
+
+        Ok(())
     }
 }
