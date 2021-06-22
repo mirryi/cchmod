@@ -103,7 +103,7 @@ impl Perm {
                 Some(c) => Err(ParseError::UnexpectedChar {
                     c,
                     pos: *pos,
-                    expected: Some(vec![c, '-']),
+                    expected: Some(vec![e, '-']),
                 }),
             };
             *pos += 1;
@@ -117,11 +117,19 @@ impl Perm {
         let write = process_char('w', &mut pos, &mut chars)?;
         let execute = process_char('x', &mut pos, &mut chars)?;
 
-        Ok(Self {
-            read,
-            write,
-            execute,
-        })
+        if let Some(c) = chars.next() {
+            Err(ParseError::UnexpectedChar {
+                c,
+                pos,
+                expected: None,
+            })
+        } else {
+            Ok(Self {
+                read,
+                write,
+                execute,
+            })
+        }
     }
 
     #[inline]
@@ -227,6 +235,12 @@ mod test {
             };
         }
 
+        macro_rules! test_perm_sym_e {
+            ($fs:expr, $err:expr) => {
+                assert_eq!($err, Perm::from_sym_full($fs).unwrap_err())
+            };
+        }
+
         test_perm_sym!("rwx", "rwx", true, true, true);
         test_perm_sym!("rw", "rw-", true, true, false);
         test_perm_sym!("rx", "r-x", true, false, true);
@@ -234,6 +248,34 @@ mod test {
         test_perm_sym!("wx", "-wx", false, true, true);
         test_perm_sym!("w", "-w-", false, true, false);
         test_perm_sym!("x", "--x", false, false, true);
+
+        test_perm_sym_e!("", ParseError::UnexpectedEoi { pos: 0 });
+        test_perm_sym_e!("r", ParseError::UnexpectedEoi { pos: 1 });
+        test_perm_sym_e!("rw", ParseError::UnexpectedEoi { pos: 2 });
+        test_perm_sym_e!(
+            "x",
+            ParseError::UnexpectedChar {
+                pos: 0,
+                c: 'x',
+                expected: Some(vec!['r', '-'])
+            }
+        );
+        test_perm_sym_e!(
+            "rr",
+            ParseError::UnexpectedChar {
+                pos: 1,
+                c: 'r',
+                expected: Some(vec!['w', '-'])
+            }
+        );
+        test_perm_sym_e!(
+            "rwxr",
+            ParseError::UnexpectedChar {
+                pos: 3,
+                c: 'r',
+                expected: None
+            }
+        );
 
         Ok(())
     }
