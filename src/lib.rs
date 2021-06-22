@@ -307,8 +307,9 @@ mod test {
         };
     }
 
+    // TODO: Add failing tests
     #[test]
-    fn test_perm_as_num() -> Result<(), Box<dyn std::error::Error>> {
+    fn test_perm_num() -> Result<(), Box<dyn std::error::Error>> {
         macro_rules! test_perm_num {
             ($c:expr, $r: expr, $w:expr, $x:expr) => {{
                 let p = perm!($r, $w, $x);
@@ -330,7 +331,7 @@ mod test {
     }
 
     #[test]
-    fn test_perm_as_sym() -> Result<(), Box<dyn std::error::Error>> {
+    fn test_perm_sym() -> Result<(), Box<dyn std::error::Error>> {
         macro_rules! test_perm_sym {
             ($s:expr, $fs:expr, $r: expr, $w:expr, $x:expr) => {
                 assert_eq!($s, perm!($r, $w, $x).as_sym());
@@ -383,8 +384,9 @@ mod test {
         Ok(())
     }
 
+    // TODO: Add failing tests
     #[test]
-    fn test_mode_as_num() -> Result<(), Box<dyn std::error::Error>> {
+    fn test_mode_num() -> Result<(), Box<dyn std::error::Error>> {
         macro_rules! test_mode_num {
             ($c:expr; $ur:expr, $uw:expr, $ux:expr; $gr:expr, $gw:expr, $gx:expr; $or:expr, $ow:expr, $ox: expr) => {
                 assert_eq!(
