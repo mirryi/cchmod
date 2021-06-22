@@ -467,4 +467,27 @@ mod test {
 
         Ok(())
     }
+
+    #[test]
+    fn test_perm_diff() {
+        use DiffOp::*;
+
+        macro_rules! test_perm_diff {
+            ($rd:expr, $wd:expr, $xd:expr; $r1:expr, $w1:expr, $x1:expr; $r2:expr, $w2:expr, $x2:expr) => {
+                assert_eq!(
+                    PermDiff {
+                        read: $rd,
+                        write: $wd,
+                        execute: $xd
+                    },
+                    perm!($r1, $w1, $x1).diff(&perm!($r2, $w2, $x2))
+                )
+            };
+        }
+
+        test_perm_diff!(Minus, Minus, Minus; true, true, true; false, false, false);
+        test_perm_diff!(Plus, Same, Plus; false, true, false; true, true, true);
+        test_perm_diff!(Minus, Plus, Same; true, false, false; false, true, false);
+        test_perm_diff!(Same, Same, Same; false, false, true; false, false, true);
+    }
 }
