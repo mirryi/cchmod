@@ -35,8 +35,13 @@ impl Mode {
     }
 
     #[inline]
-    pub fn as_num(&self) -> u16 {
-        100 * self.user.as_num() + 10 * self.group.as_num() + self.other.as_num()
+    pub fn as_num(&self) -> String {
+        format!(
+            "{}{}{}",
+            self.user.as_num(),
+            self.group.as_num(),
+            self.other.as_num()
+        )
     }
 
     #[inline]
@@ -47,6 +52,37 @@ impl Mode {
             self.group.as_sym_full(),
             self.other.as_sym_full()
         )
+    }
+
+    #[inline]
+    pub fn from_num(num: &str) -> Result<Self, ParseError> {
+        #[inline]
+        fn next_val(pos: &mut usize, chars: &mut Chars) -> Result<Perm, ParseError> {
+            let c = chars
+                .next()
+                .ok_or_else(|| ParseError::UnexpectedEoi { pos: *pos })?;
+            *pos += 1;
+            Perm::from_num(&c.to_string()).map_err(|err| match err {
+                ParseError::UnexpectedChar {
+                    c,
+                    pos: p,
+                    expected,
+                } => ParseError::UnexpectedChar {
+                    c,
+                    pos: p + *pos,
+                    expected,
+                },
+                ParseError::UnexpectedEoi { pos: p } => ParseError::UnexpectedEoi { pos: p + *pos },
+            })
+        }
+
+        let mut chars = num.chars();
+        let mut pos = 0;
+        Ok(Self {
+            user: next_val(&mut pos, &mut chars)?,
+            group: next_val(&mut pos, &mut chars)?,
+            other: next_val(&mut pos, &mut chars)?,
+        })
     }
 
     #[inline]
@@ -92,10 +128,11 @@ impl Mode {
 
 impl Perm {
     #[inline]
-    pub fn as_num(&self) -> u16 {
-        (if self.read { 4 } else { 0 })
+    pub fn as_num(&self) -> String {
+        ((if self.read { 4 } else { 0 })
             + (if self.write { 2 } else { 0 })
-            + (if self.execute { 1 } else { 0 })
+            + (if self.execute { 1 } else { 0 }))
+        .to_string()
     }
 
     #[inline]
@@ -112,6 +149,34 @@ impl Perm {
         let w = if self.write { "w" } else { "-" };
         let x = if self.execute { "x" } else { "-" };
         format!("{}{}{}", r, w, x)
+    }
+
+    #[inline]
+    pub fn from_num(num: &str) -> Result<Self, ParseError> {
+        let tup = match num {
+            "7" => (true, true, true),
+            "6" => (true, true, false),
+            "5" => (true, false, true),
+            "4" => (true, false, false),
+            "3" => (false, true, true),
+            "2" => (false, true, false),
+            "1" => (false, false, true),
+            "0" => (false, false, false),
+            "" => return Err(ParseError::UnexpectedEoi { pos: 0 }),
+            c => {
+                return Err(ParseError::UnexpectedChar {
+                    c: c.chars().next().unwrap(),
+                    pos: 0,
+                    expected: Some(
+                        (0..=7)
+                            .map(|n| std::char::from_digit(n, 10).unwrap())
+                            .collect(),
+                    ),
+                })
+            }
+        };
+
+        Ok(tup.into())
     }
 
     #[inline]
@@ -160,6 +225,17 @@ impl Perm {
             read: diff(self.read, other.read),
             write: diff(self.write, other.write),
             execute: diff(self.execute, other.execute),
+        }
+    }
+}
+
+impl From<(bool, bool, bool)> for Perm {
+    #[inline]
+    fn from(tup: (bool, bool, bool)) -> Self {
+        Self {
+            read: tup.0,
+            write: tup.1,
+            execute: tup.2,
         }
     }
 }
@@ -239,13 +315,14 @@ mod test {
             };
         }
 
-        test_perm_num!(7, true, true, true);
-        test_perm_num!(6, true, true, false);
-        test_perm_num!(5, true, false, true);
-        test_perm_num!(4, true, false, false);
-        test_perm_num!(3, false, true, true);
-        test_perm_num!(2, false, true, false);
-        test_perm_num!(1, false, false, true);
+        test_perm_num!("7", true, true, true);
+        test_perm_num!("6", true, true, false);
+        test_perm_num!("5", true, false, true);
+        test_perm_num!("4", true, false, false);
+        test_perm_num!("3", false, true, true);
+        test_perm_num!("2", false, true, false);
+        test_perm_num!("1", false, false, true);
+        test_perm_num!("0", false, false, false);
     }
 
     #[test]
@@ -313,11 +390,11 @@ mod test {
             };
         }
 
-        test_mode_num!(777; true, true, true; true, true, true; true, true, true);
-        test_mode_num!(755; true, true, true; true, false, true; true, false, true);
-        test_mode_num!(666; true, true, false; true, true, false; true, true, false);
-        test_mode_num!(644; true, true, false; true, false, false; true, false, false);
-        test_mode_num!(400; true, false, false; false, false, false; false, false, false);
+        test_mode_num!("777"; true, true, true; true, true, true; true, true, true);
+        test_mode_num!("755"; true, true, true; true, false, true; true, false, true);
+        test_mode_num!("666"; true, true, false; true, true, false; true, true, false);
+        test_mode_num!("644"; true, true, false; true, false, false; true, false, false);
+        test_mode_num!("400"; true, false, false; false, false, false; false, false, false);
     }
 
     #[test]
