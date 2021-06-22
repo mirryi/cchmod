@@ -2,7 +2,14 @@
 name = "cchmod"
 version = "0.1.0"
 authors = ["Eric Zhao <21zhaoe@protonmail.com>"]
+license = "MIT"
+description = "chmod calculator."
+homepage = "https://github.com/Dophin2009/cchmod"
+repository = "https://github.com/Dophin2009/cchmod.git"
 edition = "2018"
+
+[package.metadata]
+msrv = "1.46.0"
 
 [[bin]]
 name = "cchmod"
