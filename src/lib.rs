@@ -51,21 +51,11 @@ impl Mode {
 
     #[inline]
     pub fn from_sym(sym: &str) -> Result<Self, ParseError> {
-        match sym.len() {
-            9 => {
-                let user = Perm::from_sym_full(sym)?;
-                let group = Perm::from_sym_full(&sym.chars().skip(3).collect::<String>())?;
-                let other = Perm::from_sym_full(&sym.chars().skip(6).collect::<String>())?;
+        let user = Perm::from_sym_full(&sym.chars().take(3).collect::<String>())?;
+        let group = Perm::from_sym_full(&sym.chars().skip(3).take(3).collect::<String>())?;
+        let other = Perm::from_sym_full(&sym.chars().skip(6).take(3).collect::<String>())?;
 
-                Ok(Self { user, group, other })
-            }
-            pos @ 0..=8 => Err(ParseError::UnexpectedEoi { pos }),
-            _ => Err(ParseError::UnexpectedChar {
-                pos: 9,
-                c: sym.chars().nth(9).unwrap(),
-                expected: None,
-            }),
-        }
+        Ok(Self { user, group, other })
     }
 
     #[inline]
