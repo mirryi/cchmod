@@ -6,14 +6,15 @@ on:
       - master
 
 jobs:
-  test:
-    name: test
-    runs-on: ${{ matrix.os }}
-
+  check:
+    name: check
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        rust:
+          - stable
+          - beta
+          - nightly
 
     steps:
       - name: Checkout repository
@@ -21,18 +22,57 @@ jobs:
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
-
-      - name: Build cchmod
-        run: |
-          cargo build --verbose
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
 
       - name: Run check
-        run: |
-          cargo clippy --verbose
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
 
-      - name: Run tests
-        run: |
-          cargo test --verbose
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - beta
+          - nightly
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+
+      - name: Run check
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+  clippy:
+    name: clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      - name: Install clippy
+        run: rustup component add clippy
+
+      - name: Run clippy
+        uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
 
   fmt:
     name: fmt 
@@ -43,10 +83,16 @@ jobs:
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
 
       - name: Check formatting
-        run: |
-          cargo fmt --all -- --check
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
 
   docs:
     name: docs
@@ -57,9 +103,13 @@ jobs:
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
 
-      - name: Check documentation
-        env:
-          RUSTDOCFLAGS: -D warnings
-        run: |
-          cargo doc --no-deps --document-private-items --workspace
+      - name: Check doc
+        uses: actions-rs/cargo@v1
+        with:
+          command: doc
+          args: --no-deps --document-private-items --workspace
