@@ -1,3 +1,7 @@
+use std::str::Chars;
+
+use thiserror::Error;
+
 #[derive(Debug)]
 pub struct Mode {
     pub user: Perm,
@@ -10,6 +14,18 @@ pub struct Perm {
     pub read: bool,
     pub write: bool,
     pub execute: bool,
+}
+
+#[derive(Debug, Error)]
+pub enum ParseError {
+    #[error("invalid character encountered")]
+    UnexpectedChar {
+        pos: usize,
+        c: char,
+        expected: Option<Vec<char>>,
+    },
+    #[error("unexepected end-of-input")]
+    UnexpectedEoi { pos: usize },
 }
 
 impl Mode {
@@ -31,6 +47,25 @@ impl Mode {
             self.group.as_sym_full(),
             self.other.as_sym_full()
         )
+    }
+
+    #[inline]
+    pub fn from_sym(sym: &str) -> Result<Self, ParseError> {
+        if sym.len() < 9 {
+            Err(ParseError::UnexpectedEoi { pos: sym.len() })
+        } else if sym.len() > 9 {
+            Err(ParseError::UnexpectedChar {
+                pos: 9,
+                c: sym.chars().nth(9).unwrap(),
+                expected: None,
+            })
+        } else {
+            let user = Perm::from_sym(sym)?;
+            let group = Perm::from_sym(&sym.chars().skip(3).collect::<String>())?;
+            let other = Perm::from_sym(&sym.chars().skip(6).collect::<String>())?;
+
+            Ok(Self { user, group, other })
+        }
     }
 
     #[inline]
@@ -59,11 +94,44 @@ impl Perm {
         format!("{}{}{}", r, w, x)
     }
 
+    #[inline]
     pub fn as_sym_full(&self) -> String {
         let r = if self.read { "r" } else { "-" };
         let w = if self.write { "w" } else { "-" };
         let x = if self.execute { "x" } else { "-" };
         format!("{}{}{}", r, w, x)
+    }
+
+    #[inline]
+    pub fn from_sym(sym: &str) -> Result<Self, ParseError> {
+        #[inline]
+        fn process_char(e: char, pos: &mut usize, chars: &mut Chars) -> Result<bool, ParseError> {
+            let r = match chars.next() {
+                None => Err(ParseError::UnexpectedEoi { pos: *pos }),
+                Some(c) if c == e => Ok(true),
+                Some('-') => Ok(false),
+                Some(c) => Err(ParseError::UnexpectedChar {
+                    c,
+                    pos: *pos,
+                    expected: Some(vec![c, '-']),
+                }),
+            };
+            *pos += 1;
+            r
+        }
+
+        let mut chars = sym.chars();
+
+        let mut pos = 0;
+        let read = process_char('r', &mut pos, &mut chars)?;
+        let write = process_char('w', &mut pos, &mut chars)?;
+        let execute = process_char('x', &mut pos, &mut chars)?;
+
+        Ok(Self {
+            read,
+            write,
+            execute,
+        })
     }
 
     #[inline]
