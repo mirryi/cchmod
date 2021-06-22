@@ -34,6 +34,6 @@ impl AsNum for Perm {
 impl AsSym for Perm {
     #[inline]
     fn as_sym(&self) -> String {
-        self.as_sym()
+        self.as_sym_full()
     }
 }
