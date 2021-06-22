@@ -1,3 +1,5 @@
+pub mod traits;
+
 use std::str::Chars;
 
 use thiserror::Error;
