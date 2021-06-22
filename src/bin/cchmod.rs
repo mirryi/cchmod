@@ -54,7 +54,7 @@ fn convert<T: AsNum + AsSym>(v: &T, as_num: bool) -> String {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum Parsed {
     Mode(Mode),
     Perm(Perm),
@@ -72,6 +72,7 @@ fn try_parse(input: &str) -> Option<Parsed> {
 
 #[cfg(test)]
 mod test {
+
     #[test]
     fn test_output_as_num() {
         macro_rules! test {
@@ -89,5 +90,89 @@ mod test {
             false,
             false
         );
+    }
+
+    #[test]
+    fn test_try_parse() {
+        use super::Parsed::*;
+        use cchmod::{Mode, Perm};
+
+        macro_rules! test {
+            ($c:expr, $input:expr) => {
+                assert_eq!(Some($c), super::try_parse($input))
+            };
+        }
+
+        macro_rules! test_fail {
+            ($input:expr) => {
+                assert_eq!(None, super::try_parse($input))
+            };
+        }
+
+        test!(
+            Mode(Mode {
+                user: Perm {
+                    read: true,
+                    write: true,
+                    execute: true
+                },
+                group: Perm {
+                    read: true,
+                    write: true,
+                    execute: true
+                },
+                other: Perm {
+                    read: true,
+                    write: true,
+                    execute: true
+                }
+            }),
+            "rwxrwxrwx"
+        );
+        test!(
+            Mode(Mode {
+                user: Perm {
+                    read: true,
+                    write: true,
+                    execute: true
+                },
+                group: Perm {
+                    read: true,
+                    write: true,
+                    execute: true
+                },
+                other: Perm {
+                    read: true,
+                    write: true,
+                    execute: true
+                }
+            }),
+            "777"
+        );
+        test!(
+            Perm(Perm {
+                read: true,
+                write: true,
+                execute: true
+            }),
+            "rwx"
+        );
+        test!(
+            Perm(Perm {
+                read: true,
+                write: true,
+                execute: true
+            }),
+            "7"
+        );
+
+        test_fail!("");
+        test_fail!("rx");
+        test_fail!("rwxx");
+        test_fail!("rwxrwx");
+        test_fail!("8");
+        test_fail!("77");
+        test_fail!("585");
+        test_fail!("4444");
     }
 }
