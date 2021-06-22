@@ -1,4 +1,5 @@
 [![Build status](https://github.com/Dophin2009/cchmod/workflows/ci/badge.svg)](https://github.com/Dophin2009/cchmod/actions)
+[![Crates.io](https://img.shields.io/crates/v/cchmod.svg)](https://crates.io/crates/cchmod)
 
 # cchmod
 
