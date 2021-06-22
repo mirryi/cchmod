@@ -1,0 +1,31 @@
+# Maintainer: Eric Zhao <21zhaoe@protonmail.com>
+# Contributor: Eric Zhao <21zhaoe@protonmail.com>
+pkgname=cchmod
+pkgver=0.1.0
+pkgrel=2
+pkgdesc="chmod calculator."
+arch=('x86_64')
+url="https://github.com/Dophin2009/cchmod"
+license=('MIT')
+makedepends=('cargo')
+source=("$pkgname-$pkgver.tar.gz::https://github.com/Dophin2009/$pkgname/archive/refs/tags/v$pkgver.tar.gz")
+sha512sums=('3968d59cc152f72bfdc5fd12d0c19b583eeb77b78887c569c6a9b2db1ccd1e4691c0dd5b564e20db11172bff67ea8979f3de8a5b19ffa6f41e4d7596ecfc8bce')
+
+build() {
+  cd "$pkgname-$pkgver"
+  cargo build --release --locked --all-features --target-dir=target
+}
+
+check() {
+  cd "$pkgname-$pkgver"
+
+  cargo test --release --locked --target-dir=target
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  install -Dm755 "target/release/cchmod" "$pkgdir/usr/bin/cchmod"
+
+  install -Dm644 "README.md" "$pkgdir/usr/share/doc/${pkgname}/README.md"
+  install -Dm644 "LICENSE" "$pkgdir/usr/share/licenses/${pkgname}/LICENSE"
+}
