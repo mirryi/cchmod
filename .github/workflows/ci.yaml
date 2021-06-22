@@ -7,6 +7,7 @@ on:
     paths-ignore:
       - '**/README.md'
       - '**/ci/PKGBUILD'
+      - '**/ci/*.ebuild'
 
 jobs:
   check:
