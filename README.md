@@ -1,5 +1,6 @@
 [![Build status](https://github.com/Dophin2009/cchmod/workflows/ci/badge.svg)](https://github.com/Dophin2009/cchmod/actions)
 [![Crates.io](https://img.shields.io/crates/v/cchmod.svg)](https://crates.io/crates/cchmod)
+[![Docs.rs](https://docs.rs/cchmod/badge.svg)](https://docs.rs/cchmod)
 
 # cchmod
 
@@ -57,3 +58,16 @@ $ cchmod -n r-x
 $ cchmod -s 7
 rwx
 ```
+
+## Library
+
+cchmod can be used as a library:
+
+```rust
+use cchmod::Mode;
+
+let m = Mode::from_sym("rw-r--r--").unwrap();
+println!(m.as_num());
+```
+
+See the [docs](https://docs.rs/cchmod/0.1.0/cchmod/) for more information.
