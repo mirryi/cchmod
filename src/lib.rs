@@ -80,11 +80,19 @@ impl Mode {
 
         let mut chars = num.chars();
         let mut pos = 0;
-        Ok(Self {
-            user: next_val(&mut pos, &mut chars)?,
-            group: next_val(&mut pos, &mut chars)?,
-            other: next_val(&mut pos, &mut chars)?,
-        })
+        let user = next_val(&mut pos, &mut chars)?;
+        let group = next_val(&mut pos, &mut chars)?;
+        let other = next_val(&mut pos, &mut chars)?;
+
+        if let Some(c) = chars.next() {
+            Err(ParseError::UnexpectedChar {
+                pos,
+                c,
+                expected: None,
+            })
+        } else {
+            Ok(Self { user, group, other })
+        }
     }
 
     #[inline]
