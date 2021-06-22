@@ -1,3 +1,4 @@
+/// Additional related convenience traits.
 pub mod traits;
 
 use std::str::Chars;
@@ -55,7 +56,7 @@ impl Mode {
         Self { user, group, other }
     }
 
-    /// Get the numeric representation the [`Mode`].
+    /// Get the octal representation the [`Mode`].
     ///
     /// # Examples
     ///
@@ -101,7 +102,7 @@ impl Mode {
         )
     }
 
-    /// Create a [`Mode`] from its numeric form, returning [`ParseError`] if the input is invalid.
+    /// Create a [`Mode`] from its octal form, returning [`ParseError`] if the input is invalid.
     ///
     /// # Examples
     ///
@@ -243,6 +244,7 @@ impl Mode {
 }
 
 impl Perm {
+    /// Create a new [`Perm`].
     #[inline]
     pub fn new(read: bool, write: bool, execute: bool) -> Self {
         Self {
@@ -252,6 +254,19 @@ impl Perm {
         }
     }
 
+    /// Get the octal representation the [`Perm`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cchmod::Perm;
+    ///
+    /// let p1 = Perm::new(true, true, false);
+    /// assert_eq!("6", p1.as_num());
+    ///
+    /// let p2 = Perm::new(true, false, true);
+    /// assert_eq!("5", p2.as_num());
+    /// ```
     #[inline]
     pub fn as_num(&self) -> String {
         ((if self.read { 4 } else { 0 })
@@ -260,6 +275,19 @@ impl Perm {
         .to_string()
     }
 
+    /// Get the symbolic representation, with ungranted permissions omitted, of the [`Perm`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cchmod::Perm;
+    ///
+    /// let p1 = Perm::new(true, true, false);
+    /// assert_eq!("rw", p1.as_sym());
+    ///
+    /// let p2 = Perm::new(true, false, true);
+    /// assert_eq!("rx", p2.as_sym());
+    /// ```
     #[inline]
     pub fn as_sym(&self) -> String {
         let r = if self.read { "r" } else { "" };
@@ -268,6 +296,19 @@ impl Perm {
         format!("{}{}{}", r, w, x)
     }
 
+    /// Get the symbolic representation, with ungranted permissions as '-', of the [`Perm`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cchmod::Perm;
+    ///
+    /// let p1 = Perm::new(true, true, false);
+    /// assert_eq!("rw-", p1.as_sym_full());
+    ///
+    /// let p2 = Perm::new(true, false, true);
+    /// assert_eq!("r-x", p2.as_sym_full());
+    /// ```
     #[inline]
     pub fn as_sym_full(&self) -> String {
         let r = if self.read { "r" } else { "-" };
@@ -276,6 +317,29 @@ impl Perm {
         format!("{}{}{}", r, w, x)
     }
 
+    /// Create a [`Perm`] from its octal form, returning [`ParseError`] if the input is invalid.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cchmod::{Perm, ParseError};
+    ///
+    /// assert_eq!(Perm::new(true, true, true), Perm::from_num("7").unwrap());
+    /// assert_eq!(Perm::new(true, false, false), Perm::from_num("4").unwrap());
+    ///
+    /// assert_eq!(
+    ///     ParseError::UnexpectedEoi { pos: 0 },
+    ///     Perm::from_num("").unwrap_err()
+    /// );
+    /// assert_eq!(
+    ///     ParseError::UnexpectedChar {
+    ///         pos: 0,
+    ///         c: '8',
+    ///         expected: Some(vec!['0', '1', '2', '3', '4', '5', '6', '7'])
+    ///     },
+    ///     Perm::from_num("8").unwrap_err()
+    /// );
+    /// ```
     #[inline]
     pub fn from_num(num: &str) -> Result<Self, ParseError> {
         let tup = match num {
@@ -304,6 +368,25 @@ impl Perm {
         Ok(tup.into())
     }
 
+    /// Create a [`Perm`] from its symbolic form, returning [`ParseError`] if the input is invalid.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cchmod::{Perm, ParseError};
+    ///
+    /// assert_eq!(Perm::new(true, true, true), Perm::from_sym_full("rwx").unwrap());
+    /// assert_eq!(Perm::new(true, false, false), Perm::from_sym_full("r--").unwrap());
+    ///
+    /// assert_eq!(
+    ///     ParseError::UnexpectedEoi { pos: 2 },
+    ///     Perm::from_sym_full("rw").unwrap_err()
+    /// );
+    /// assert_eq!(
+    ///     ParseError::UnexpectedChar { pos: 3, c: 'r', expected: None },
+    ///     Perm::from_sym_full("rwxr").unwrap_err()
+    /// );
+    /// ```
     #[inline]
     pub fn from_sym_full(sym: &str) -> Result<Self, ParseError> {
         #[inline]
@@ -344,6 +427,21 @@ impl Perm {
         }
     }
 
+    /// Compute the diff ([`PermDiff`]) between two [`Perm`]s.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use cchmod::{Perm, PermDiff, DiffOp::*};
+    ///
+    /// let a = Perm::from_num("7").unwrap();
+    /// let b = Perm::from_num("6").unwrap();
+    ///
+    /// assert_eq!(
+    ///     PermDiff { read: Same, write: Same, execute: Minus },
+    ///     a.diff(&b)
+    /// );
+    /// ```
     #[inline]
     pub fn diff(&self, other: &Self) -> PermDiff {
         PermDiff {
@@ -355,6 +453,7 @@ impl Perm {
 }
 
 impl From<(bool, bool, bool)> for Perm {
+    /// Create a [`Perm`] from a tuple of boolean with form `(user, group, other)`.
     #[inline]
     fn from(tup: (bool, bool, bool)) -> Self {
         Self {
@@ -365,6 +464,7 @@ impl From<(bool, bool, bool)> for Perm {
     }
 }
 
+/// The diff between two Modes.
 #[derive(Debug, PartialEq)]
 pub struct ModeDiff {
     pub user: PermDiff,
@@ -372,6 +472,7 @@ pub struct ModeDiff {
     pub other: PermDiff,
 }
 
+/// The diff between two Perms.
 #[derive(Debug, PartialEq)]
 pub struct PermDiff {
     pub read: DiffOp,
@@ -379,6 +480,7 @@ pub struct PermDiff {
     pub execute: DiffOp,
 }
 
+/// Enum for diff between two values.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum DiffOp {
     Plus,

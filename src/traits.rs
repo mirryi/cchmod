@@ -1,9 +1,11 @@
 use crate::{Mode, Perm};
 
+/// Trait for conversion of a value into numerical form.
 pub trait AsNum {
     fn as_num(&self) -> String;
 }
 
+/// Trait for conversion of a value into symbolic form.
 pub trait AsSym {
     fn as_sym(&self) -> String;
 }
