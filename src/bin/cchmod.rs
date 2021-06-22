@@ -2,9 +2,10 @@ use cchmod::{
     traits::{AsNum, AsSym},
     Mode, Perm,
 };
-use clap::Clap;
+use clap::{crate_authors, crate_description, crate_name, crate_version, Clap};
 
 #[derive(Clap)]
+#[clap(name = crate_name!(), version = crate_version!(), author = crate_authors!(), about = crate_description!())]
 pub struct Opts {
     input: String,
 
