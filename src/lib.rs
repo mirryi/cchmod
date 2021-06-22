@@ -158,6 +158,15 @@ impl Mode {
 
 impl Perm {
     #[inline]
+    pub fn new(read: bool, write: bool, execute: bool) -> Self {
+        Self {
+            read,
+            write,
+            execute,
+        }
+    }
+
+    #[inline]
     pub fn as_num(&self) -> String {
         ((if self.read { 4 } else { 0 })
             + (if self.write { 2 } else { 0 })
@@ -312,28 +321,20 @@ mod test {
 
     macro_rules! perm {
         ($r:expr, $w:expr, $x:expr) => {
-            Perm {
-                read: $r,
-                write: $w,
-                execute: $x,
-            }
+            Perm::new($r, $w, $x)
         };
     }
 
     macro_rules! mode {
         ($u:expr, $g:expr, $o:expr) => {
-            Mode {
-                user: $u,
-                group: $g,
-                other: $o,
-            }
+            Mode::new($u, $g, $o)
         };
         ($ur:expr, $uw:expr, $ux:expr, $gr:expr, $gw:expr, $gx:expr, $or:expr, $ow:expr, $ox: expr) => {
-            Mode {
-                user: perm!($ur, $uw, $ux),
-                group: perm!($gr, $gw, $gx),
-                other: perm!($or, $ow, $ox),
-            }
+            Mode::new(
+                perm!($ur, $uw, $ux),
+                perm!($gr, $gw, $gx),
+                perm!($or, $ow, $ox),
+            )
         };
     }
 
