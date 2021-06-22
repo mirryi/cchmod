@@ -6,7 +6,7 @@ on:
       - master
     paths-ignore:
       - '**/README.md'
-      - 'ci/PKGBUILD'
+      - '**/ci/PKGBUILD'
 
 jobs:
   check:
