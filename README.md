@@ -70,4 +70,4 @@ let m = Mode::from_sym("rw-r--r--").unwrap();
 println!("{}", m.as_num());
 ```
 
-See the [docs](https://docs.rs/cchmod/0.1.0/cchmod/) for more information.
+See the [docs](https://docs.rs/cchmod) for more information.
