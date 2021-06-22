@@ -212,7 +212,7 @@ mod test {
     }
 
     #[test]
-    fn test_perm_num() {
+    fn test_perm_as_num() {
         macro_rules! perm_num {
             ($r:expr, $w:expr, $x:expr) => {
                 perm!($r, $w, $x).as_num()
@@ -235,7 +235,7 @@ mod test {
     }
 
     #[test]
-    fn test_perm_sym() {
+    fn test_perm_as_sym() {
         macro_rules! perm_sym {
             ($r:expr, $w:expr, $x:expr) => {
                 perm!($r, $w, $x).as_sym()
@@ -258,7 +258,7 @@ mod test {
     }
 
     #[test]
-    fn test_mode_num() {
+    fn test_mode_as_num() {
         macro_rules! mode_num {
             ($ur:expr, $uw:expr, $ux:expr, $gr:expr, $gw:expr, $gx:expr, $or:expr, $ow:expr, $ox: expr) => {
                 mode!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox).as_num()
@@ -279,7 +279,7 @@ mod test {
     }
 
     #[test]
-    fn test_mode_sym() {
+    fn test_mode_as_sym() {
         macro_rules! mode_sym {
             ($ur:expr, $uw:expr, $ux:expr, $gr:expr, $gw:expr, $gx:expr, $or:expr, $ow:expr, $ox: expr) => {
                 mode!($ur, $uw, $ux, $gr, $gw, $gx, $or, $ow, $ox).as_sym()
