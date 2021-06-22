@@ -53,9 +53,9 @@ impl Mode {
     pub fn from_sym(sym: &str) -> Result<Self, ParseError> {
         match sym.len() {
             9 => {
-                let user = Perm::from_sym(sym)?;
-                let group = Perm::from_sym(&sym.chars().skip(3).collect::<String>())?;
-                let other = Perm::from_sym(&sym.chars().skip(6).collect::<String>())?;
+                let user = Perm::from_sym_full(sym)?;
+                let group = Perm::from_sym_full(&sym.chars().skip(3).collect::<String>())?;
+                let other = Perm::from_sym_full(&sym.chars().skip(6).collect::<String>())?;
 
                 Ok(Self { user, group, other })
             }
@@ -103,7 +103,7 @@ impl Perm {
     }
 
     #[inline]
-    pub fn from_sym(sym: &str) -> Result<Self, ParseError> {
+    pub fn from_sym_full(sym: &str) -> Result<Self, ParseError> {
         #[inline]
         fn process_char(e: char, pos: &mut usize, chars: &mut Chars) -> Result<bool, ParseError> {
             let r = match chars.next() {
@@ -233,7 +233,7 @@ mod test {
         macro_rules! test_perm_sym {
             ($s:expr, $fs:expr, $r: expr, $w:expr, $x:expr) => {
                 assert_eq!($s, perm!($r, $w, $x).as_sym());
-                assert_eq!(perm!($r, $w, $x), Perm::from_sym($fs)?)
+                assert_eq!(perm!($r, $w, $x), Perm::from_sym_full($fs)?)
             };
         }
 
