@@ -2,21 +2,21 @@ use std::str::Chars;
 
 use thiserror::Error;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Mode {
     pub user: Perm,
     pub group: Perm,
     pub other: Perm,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Perm {
     pub read: bool,
     pub write: bool,
     pub execute: bool,
 }
 
-#[derive(Debug, Error)]
+#[derive(Debug, PartialEq, Error)]
 pub enum ParseError {
     #[error("invalid character encountered")]
     UnexpectedChar {
@@ -144,21 +144,21 @@ impl Perm {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct ModeDiff {
     pub user: PermDiff,
     pub group: PermDiff,
     pub other: PermDiff,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct PermDiff {
     pub read: DiffOp,
     pub write: DiffOp,
     pub execute: DiffOp,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum DiffOp {
     Plus,
     Same,
