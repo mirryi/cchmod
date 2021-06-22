@@ -21,10 +21,6 @@ jobs:
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ matrix.rust }}
-          profile: minimal
-          override: true
 
       - name: Build cchmod
         run: |
@@ -39,7 +35,7 @@ jobs:
           cargo test --verbose
 
   fmt:
-    name: rustfmt
+    name: fmt 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -47,11 +43,6 @@ jobs:
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          profile: minimal
-          components: rustfmt
 
       - name: Check formatting
         run: |
@@ -66,10 +57,6 @@ jobs:
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
 
       - name: Check documentation
         env:
