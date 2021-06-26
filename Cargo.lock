@@ -30,6 +30,7 @@ name = "cchmod"
 version = "0.1.1"
 dependencies = [
  "clap",
+ "doc-comment",
  "thiserror",
 ]
 
@@ -64,6 +65,12 @@ dependencies = [
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "doc-comment"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fea41bba32d969b513997752735605054bc0dfa92b4c56bf1189f2e174be7a10"
 
 [[package]]
 name = "hashbrown"

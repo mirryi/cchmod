@@ -17,4 +17,5 @@ path = "src/bin/cchmod.rs"
 
 [dependencies]
 clap = "3.0.0-beta.2"
+doc-comment = "0.3"
 thiserror = "1.0"
