@@ -1,3 +1,6 @@
+/// Permission value constants.
+pub mod perm;
+
 /// Additional related convenience traits.
 pub mod traits;
 
