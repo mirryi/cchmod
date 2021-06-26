@@ -1,6 +1,4 @@
 pub mod perm;
-
-/// Additional related convenience traits.
 pub mod traits;
 
 use std::str::Chars;

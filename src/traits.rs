@@ -1,3 +1,5 @@
+//! Additional related convenience traits.
+
 use crate::{Mode, Perm};
 
 /// Trait for conversion of a value into numerical form.
