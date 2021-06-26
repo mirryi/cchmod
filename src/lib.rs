@@ -1,4 +1,3 @@
-/// Permission value constants.
 pub mod perm;
 
 /// Additional related convenience traits.
@@ -20,6 +19,8 @@ pub struct Mode {
 }
 
 /// File system object permissions.
+///
+/// See [`perm`] for predefined constant values.
 #[derive(Debug, PartialEq)]
 pub struct Perm {
     /// Flag indicating whether *read* permission is granted.
@@ -544,14 +545,14 @@ mod test {
             };
         }
 
-        test_perm_num!("7", _7);
-        test_perm_num!("6", _6);
-        test_perm_num!("5", _5);
-        test_perm_num!("4", _4);
-        test_perm_num!("3", _3);
-        test_perm_num!("2", _2);
-        test_perm_num!("1", _1);
-        test_perm_num!("0", _0);
+        test_perm_num!("7", RWX);
+        test_perm_num!("6", RW);
+        test_perm_num!("5", RX);
+        test_perm_num!("4", R);
+        test_perm_num!("3", WX);
+        test_perm_num!("2", W);
+        test_perm_num!("1", X);
+        test_perm_num!("0", EMPTY);
 
         Ok(())
     }
@@ -577,14 +578,14 @@ mod test {
             };
         }
 
-        test_perm_sym!("rwx", "rwx", _7);
-        test_perm_sym!("rw", "rw-", _6);
-        test_perm_sym!("rx", "r-x", _5);
-        test_perm_sym!("r", "r--", _4);
-        test_perm_sym!("wx", "-wx", _3);
-        test_perm_sym!("w", "-w-", _2);
-        test_perm_sym!("x", "--x", _1);
-        test_perm_sym!("", "---", _0);
+        test_perm_sym!("rwx", "rwx", RWX);
+        test_perm_sym!("rw", "rw-", RW);
+        test_perm_sym!("rx", "r-x", RX);
+        test_perm_sym!("r", "r--", R);
+        test_perm_sym!("wx", "-wx", WX);
+        test_perm_sym!("w", "-w-", W);
+        test_perm_sym!("x", "--x", X);
+        test_perm_sym!("", "---", EMPTY);
 
         test_perm_sym_e!("", ParseError::UnexpectedEoi { pos: 0 });
         test_perm_sym_e!("r", ParseError::UnexpectedEoi { pos: 1 });
