@@ -532,32 +532,42 @@ mod test {
     // TODO: Add failing tests
     #[test]
     fn test_perm_num() -> Result<(), Box<dyn std::error::Error>> {
+        use perm::*;
+
         macro_rules! test_perm_num {
-            ($c:expr, $r: expr, $w:expr, $x:expr) => {{
-                let p = perm!($r, $w, $x);
-                assert_eq!($c, p.as_num());
-                assert_eq!(p, Perm::from_num($c)?)
+            ($c:expr, $p:expr) => {{
+                assert_eq!($c, $p.as_num());
+                assert_eq!($p, Perm::from_num($c)?)
             }};
+            ($c:expr, $r:expr, $w:expr, $x:expr) => {
+                test_perm_num!($c, perm!($r, $w, $x))
+            };
         }
 
-        test_perm_num!("7", true, true, true);
-        test_perm_num!("6", true, true, false);
-        test_perm_num!("5", true, false, true);
-        test_perm_num!("4", true, false, false);
-        test_perm_num!("3", false, true, true);
-        test_perm_num!("2", false, true, false);
-        test_perm_num!("1", false, false, true);
-        test_perm_num!("0", false, false, false);
+        test_perm_num!("7", _7);
+        test_perm_num!("6", _6);
+        test_perm_num!("5", _5);
+        test_perm_num!("4", _4);
+        test_perm_num!("3", _3);
+        test_perm_num!("2", _2);
+        test_perm_num!("1", _1);
+        test_perm_num!("0", _0);
 
         Ok(())
     }
 
     #[test]
     fn test_perm_sym() -> Result<(), Box<dyn std::error::Error>> {
+        use perm::*;
+
         macro_rules! test_perm_sym {
-            ($s:expr, $fs:expr, $r: expr, $w:expr, $x:expr) => {
-                assert_eq!($s, perm!($r, $w, $x).as_sym());
-                assert_eq!(perm!($r, $w, $x), Perm::from_sym_full($fs)?)
+            ($s:expr, $fs:expr, $p:expr) => {
+                assert_eq!($s, $p.as_sym());
+                assert_eq!($fs, $p.as_sym_full());
+                assert_eq!($p, Perm::from_sym_full($fs)?)
+            };
+            ($s:expr, $fs:expr, $r:expr, $w:expr, $x:expr) => {
+                test_perm_sym!($s, $fs, perm!($r, $w, $x))
             };
         }
 
@@ -567,13 +577,14 @@ mod test {
             };
         }
 
-        test_perm_sym!("rwx", "rwx", true, true, true);
-        test_perm_sym!("rw", "rw-", true, true, false);
-        test_perm_sym!("rx", "r-x", true, false, true);
-        test_perm_sym!("r", "r--", true, false, false);
-        test_perm_sym!("wx", "-wx", false, true, true);
-        test_perm_sym!("w", "-w-", false, true, false);
-        test_perm_sym!("x", "--x", false, false, true);
+        test_perm_sym!("rwx", "rwx", _7);
+        test_perm_sym!("rw", "rw-", _6);
+        test_perm_sym!("rx", "r-x", _5);
+        test_perm_sym!("r", "r--", _4);
+        test_perm_sym!("wx", "-wx", _3);
+        test_perm_sym!("w", "-w-", _2);
+        test_perm_sym!("x", "--x", _1);
+        test_perm_sym!("", "---", _0);
 
         test_perm_sym_e!("", ParseError::UnexpectedEoi { pos: 0 });
         test_perm_sym_e!("r", ParseError::UnexpectedEoi { pos: 1 });
