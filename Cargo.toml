@@ -16,6 +16,6 @@ name = "cchmod"
 path = "src/bin/cchmod.rs"
 
 [dependencies]
-clap = "3.0.0-beta.2"
+clap = { version = "3.0", features = ["cargo", "derive"] }
 doc-comment = "0.3"
 thiserror = "1.0"

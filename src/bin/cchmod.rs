@@ -2,16 +2,16 @@ use cchmod::{
     traits::{AsNum, AsSym},
     Mode, Perm,
 };
-use clap::{crate_authors, crate_description, crate_name, crate_version, Clap};
+use clap::{crate_authors, crate_description, crate_name, crate_version, Parser};
 
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(name = crate_name!(), version = crate_version!(), author = crate_authors!(), about = crate_description!())]
 pub struct Opts {
     input: String,
 
-    #[clap(short, long, about = "Output the octal form")]
+    #[clap(short, long, help = "Output the octal form")]
     num: bool,
-    #[clap(short, long, about = "Output the symbolic form")]
+    #[clap(short, long, help = "Output the symbolic form")]
     sym: bool,
 }
 
