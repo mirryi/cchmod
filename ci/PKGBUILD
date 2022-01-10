@@ -1,5 +1,5 @@
 # Maintainer: Eric Zhao <21zhaoe@protonmail.com>
-# Contributor: Eric Zhao <21zhaoe@protonmail.com>
+
 pkgname=cchmod
 pkgver=0.1.1
 pkgrel=2
