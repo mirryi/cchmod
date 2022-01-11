@@ -1,3 +1,4 @@
+---
 name: ci
 
 on:
@@ -18,7 +19,7 @@ jobs:
         rust:
           - stable
           - nightly
-          - 1.46.0
+          - 1.54.0
 
     steps:
       - name: Checkout repository
@@ -44,7 +45,7 @@ jobs:
         rust:
           - stable
           - nightly
-          - 1.46.0
+          - 1.54.0
 
     steps:
       - name: Checkout repository
@@ -70,7 +71,7 @@ jobs:
         rust:
           - stable
           - nightly
-          - 1.46.0
+          - 1.54.0
 
     steps:
       - name: Checkout repository
@@ -165,4 +166,3 @@ jobs:
         with:
           command: msrv
           args: --verify
-
