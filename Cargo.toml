@@ -9,7 +9,7 @@ repository = "https://github.com/Dophin2009/cchmod.git"
 edition = "2018"
 
 [package.metadata]
-msrv = "1.46.0"
+msrv = "1.54.0"
 
 [[bin]]
 name = "cchmod"
