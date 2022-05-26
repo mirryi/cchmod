@@ -40,8 +40,8 @@ CRATES="
 inherit cargo
 
 DESCRIPTION="chmod calculator."
-HOMEPAGE="https://github.com/Dophin2009/cchmod.git"
-SRC_URI="$(cargo_crate_uris ${CRATES}) https://github.com/Dophin2009/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
+HOMEPAGE="https://github.com/mirryi/cchmod.git"
+SRC_URI="$(cargo_crate_uris ${CRATES}) https://github.com/mirryi/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="Apache-2.0 MIT Unlicense"
 SLOT="0"
